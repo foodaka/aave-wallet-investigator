@@ -131,7 +131,7 @@ export default function WalletInvestigator() {
 
   const handleDemo = () => {
     // Use a well-known Aave wallet for demo
-    setWalletAddress('0x742d35Cc6cC65fa2c9F9F93892DE2DCfA32A77E5');
+    setWalletAddress('0x57ab7ee15cE5ECacB1aB84EE42D5A9d0d8112922');
   };
 
   // Debug: Let's see what the actual data structure is
@@ -203,7 +203,7 @@ export default function WalletInvestigator() {
               <div className="flex gap-4">
                 <div className="flex-1">
                   <Input
-                    placeholder="0x742d35Cc7497C2a26726F315b14C23Bf0Ad1c6E5"
+                    placeholder="0x57ab7ee15cE5ECacB1aB84EE42D5A9d0d8112922"
                     value={walletAddress}
                     onChange={(e) => setWalletAddress(e.target.value)}
                     className={`text-sm font-mono ${
