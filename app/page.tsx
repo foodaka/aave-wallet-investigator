@@ -50,8 +50,9 @@ export default function WalletInvestigator() {
     chainIds: mainnetChainIds,
   });
 
-  // Create hooks for each market to fetch transaction history, supplies, and borrows
+  // Create hooks for each market to fetch transaction history
   // Note: We need to create individual hooks for each known major chain due to React's rules of hooks
+  // Currently supporting 14 mainnet chains: ETH, Polygon, Arbitrum, Optimism, Avalanche, Base, BSC, Sonic, Metis, Gnosis, Scroll, Linea, Celo, Soneium
   
   
   // Helper to get market address for a chain from fetched markets
@@ -104,6 +105,57 @@ export default function WalletInvestigator() {
     chainId: 56,
   });
 
+  // Additional chains: Sonic, Metis, Gnosis, Scroll, Linea, Celo, Soneium
+  
+  // Sonic
+  const sonicTxs = useUserTransactionHistory({
+    market: getMarketForChain(146) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 146,
+  });
+
+  // Metis
+  const metisTxs = useUserTransactionHistory({
+    market: getMarketForChain(1088) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 1088,
+  });
+
+  // Gnosis
+  const gnosisTxs = useUserTransactionHistory({
+    market: getMarketForChain(100) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 100,
+  });
+
+  // Scroll
+  const scrollTxs = useUserTransactionHistory({
+    market: getMarketForChain(534352) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 534352,
+  });
+
+  // Linea
+  const lineaTxs = useUserTransactionHistory({
+    market: getMarketForChain(59144) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 59144,
+  });
+
+  // Celo
+  const celoTxs = useUserTransactionHistory({
+    market: getMarketForChain(42220) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 42220,
+  });
+
+  // Soneium
+  const soneiumTxs = useUserTransactionHistory({
+    market: getMarketForChain(1946) as EvmAddress,
+    user: isValidAddress ? (walletAddress as EvmAddress) : ('' as EvmAddress),
+    chainId: 1946,
+  });
+
 
 
   // Aggregate data and loading states from all mainnet chains
@@ -115,10 +167,20 @@ export default function WalletInvestigator() {
     ...(avalancheTxs.data?.items || []),
     ...(baseTxs.data?.items || []),
     ...(bscTxs.data?.items || []),
+    // Additional chains
+    ...(sonicTxs.data?.items || []),
+    ...(metisTxs.data?.items || []),
+    ...(gnosisTxs.data?.items || []),
+    ...(scrollTxs.data?.items || []),
+    ...(lineaTxs.data?.items || []),
+    ...(celoTxs.data?.items || []),
+    ...(soneiumTxs.data?.items || []),
   ];
   
   const loading = marketsLoading || ethTxs.loading || polygonTxs.loading || arbitrumTxs.loading || 
-                  optimismTxs.loading || avalancheTxs.loading || baseTxs.loading || bscTxs.loading;
+                  optimismTxs.loading || avalancheTxs.loading || baseTxs.loading || bscTxs.loading ||
+                  sonicTxs.loading || metisTxs.loading || gnosisTxs.loading || scrollTxs.loading ||
+                  lineaTxs.loading || celoTxs.loading || soneiumTxs.loading;
   const error = ethTxs.error; // Focus on main chain error for now
 
   const handleSearch = () => {
@@ -143,6 +205,13 @@ export default function WalletInvestigator() {
     avalanche: avalancheTxs.data,
     base: baseTxs.data,
     bsc: bscTxs.data,
+    sonic: sonicTxs.data,
+    metis: metisTxs.data,
+    gnosis: gnosisTxs.data,
+    scroll: scrollTxs.data,
+    linea: lineaTxs.data,
+    celo: celoTxs.data,
+    soneium: soneiumTxs.data,
   });
   console.log('All aggregated transaction data:', allData);
 
