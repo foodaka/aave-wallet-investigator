@@ -7,6 +7,7 @@ import {
   useAaveMarkets,
   type EvmAddress 
 } from '@aave/react';
+import { isAddress } from 'viem';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet, Search, ExternalLink, TrendingUp, TrendingDown, RefreshCw, Play } from 'lucide-react';
 
@@ -20,15 +21,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { normalizeTransaction, getTransactionTypeColor } from '@/lib/formatters';
 import { NormalizedTransaction } from '@/lib/types';
 
-// Helper function to validate Ethereum address
-function isValidEthereumAddress(address: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
 
 export default function WalletInvestigator() {
   const [walletAddress, setWalletAddress] = useState('');
 
-  const isValidAddress = isValidEthereumAddress(walletAddress);
+  const isValidAddress = isAddress(walletAddress);
   
   // Get all supported Aave chains
   const { data: chains } = useAaveChains({});
