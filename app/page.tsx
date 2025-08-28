@@ -156,6 +156,8 @@ export default function WalletInvestigator() {
     chainId: 1946,
   });
 
+  console.log('ethTxs', ethTxs)
+
 
 
   // Aggregate data and loading states from all mainnet chains

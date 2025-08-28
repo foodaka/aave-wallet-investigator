@@ -69,9 +69,31 @@ function getTransactionType(transaction: UserTransaction): NormalizedTransaction
 }
 
 /**
- * Determines transaction type more accurately based on the presence of specific fields
+ * Determines transaction type based on GraphQL __typename field
  */
-function determineTransactionType(transaction: UserTransaction): NormalizedTransaction['type'] {
+function determineTransactionType(transaction: any): NormalizedTransaction['type'] {
+  // Use GraphQL __typename field for accurate type detection
+  if (transaction.__typename) {
+    switch (transaction.__typename) {
+      case 'UserSupplyTransaction':
+        return 'Supply';
+      case 'UserWithdrawTransaction':
+        return 'Withdraw';
+      case 'UserBorrowTransaction':
+        return 'Borrow';
+      case 'UserRepayTransaction':
+        return 'Repay';
+      case 'UserUsageAsCollateralTransaction':
+        return 'Collateral';
+      case 'UserLiquidationCallTransaction':
+        return 'Liquidation';
+      default:
+        console.warn('Unknown transaction type:', transaction.__typename);
+        break;
+    }
+  }
+
+  // Fallback to old logic if __typename is not available
   // Check for liquidation first (most specific)
   if ('collateral' in transaction && 'debtRepaid' in transaction) {
     return 'Liquidation';
@@ -107,8 +129,14 @@ function determineTransactionType(transaction: UserTransaction): NormalizedTrans
 /**
  * Normalizes a transaction for consistent display
  */
-export function normalizeTransaction(transaction: UserTransaction, index: number): NormalizedTransaction {
+export function normalizeTransaction(transaction: any, index: number): NormalizedTransaction {
   const type = determineTransactionType(transaction);
+  
+  // Debug log to verify transaction type detection
+  if (transaction.__typename) {
+    console.log(`Transaction ${index}: ${transaction.__typename} -> ${type}`);
+  }
+  
   const baseData = {
     id: `${transaction.txHash}-${index}`,
     type,
