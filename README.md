@@ -1,10 +1,9 @@
 # Aave Wallet Investigator
 
-See it live ![https://wallet.justuseaave.xyz/]
+See it live https://wallet.justuseaave.xyz/
 
 A beautiful, responsive Next.js application that allows users to explore Aave transaction history for any Ethereum wallet address. Built with modern technologies and a polished crypto dashboard aesthetic.
 
-![Aave Wallet Investigator](https://via.placeholder.com/800x400/1e293b/ffffff?text=Aave+Wallet+Investigator)
 
 ## ✨ Features
 
