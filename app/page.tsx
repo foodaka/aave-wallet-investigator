@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { 
-  useUserTransactionHistory, 
-  useAaveChains, 
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+  useUserTransactionHistory,
+  useAaveChains,
   useAaveMarkets,
-  type EvmAddress 
+  type EvmAddress
 } from '@aave/react';
 import { isAddress } from 'viem';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,18 +25,27 @@ import { NormalizedTransaction } from '@/lib/types';
 
 export default function WalletInvestigator() {
   const [walletAddress, setWalletAddress] = useState('');
+  const searchParams = useSearchParams();
+
+  // Check for wallet address in URL parameters on component mount
+  useEffect(() => {
+    const urlWalletAddress = searchParams.get('walletAddress');
+    if (urlWalletAddress && isAddress(urlWalletAddress)) {
+      setWalletAddress(urlWalletAddress);
+    }
+  }, [searchParams]);
 
   const isValidAddress = isAddress(walletAddress);
-  
+
   // Get all supported Aave chains
   const { data: chains } = useAaveChains({});
 
   console.log('Chains:', chains);
-  
+
   // Get mainnet chains
   const mainnetChains = useMemo(() => {
     if (!chains) return [];
-    
+
     // Filter for mainnet chains only (exclude testnets)
     return chains.filter(chain => !chain.isTestnet);
   }, [chains]);
@@ -53,8 +63,8 @@ export default function WalletInvestigator() {
   // Create hooks for each market to fetch transaction history
   // Note: We need to create individual hooks for each known major chain due to React's rules of hooks
   // Currently supporting 14 mainnet chains: ETH, Polygon, Arbitrum, Optimism, Avalanche, Base, BSC, Sonic, Metis, Gnosis, Scroll, Linea, Celo, Soneium
-  
-  
+
+
   // Helper to get market address for a chain from fetched markets
   const getMarketForChain = (chainId: number): string => {
     if (!allMarkets) return '';
@@ -106,7 +116,7 @@ export default function WalletInvestigator() {
   });
 
   // Additional chains: Sonic, Metis, Gnosis, Scroll, Linea, Celo, Soneium
-  
+
   // Sonic
   const sonicTxs = useUserTransactionHistory({
     market: getMarketForChain(146) as EvmAddress,
@@ -178,11 +188,11 @@ export default function WalletInvestigator() {
     ...(celoTxs.data?.items || []),
     ...(soneiumTxs.data?.items || []),
   ];
-  
-  const loading = marketsLoading || ethTxs.loading || polygonTxs.loading || arbitrumTxs.loading || 
-                  optimismTxs.loading || avalancheTxs.loading || baseTxs.loading || bscTxs.loading ||
-                  sonicTxs.loading || metisTxs.loading || gnosisTxs.loading || scrollTxs.loading ||
-                  lineaTxs.loading || celoTxs.loading || soneiumTxs.loading;
+
+  const loading = marketsLoading || ethTxs.loading || polygonTxs.loading || arbitrumTxs.loading ||
+    optimismTxs.loading || avalancheTxs.loading || baseTxs.loading || bscTxs.loading ||
+    sonicTxs.loading || metisTxs.loading || gnosisTxs.loading || scrollTxs.loading ||
+    lineaTxs.loading || celoTxs.loading || soneiumTxs.loading;
   const error = ethTxs.error; // Focus on main chain error for now
 
   const handleSearch = () => {
@@ -217,11 +227,11 @@ export default function WalletInvestigator() {
   });
   console.log('All aggregated transaction data:', allData);
 
-  const normalizedTransactions: NormalizedTransaction[] = 
-    (isValidAddress && allData.length > 0) 
+  const normalizedTransactions: NormalizedTransaction[] =
+    (isValidAddress && allData.length > 0)
       ? allData
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // Sort raw transactions by latest first
-          .map((tx: any, index: number) => normalizeTransaction(tx, index))
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // Sort raw transactions by latest first
+        .map((tx: any, index: number) => normalizeTransaction(tx, index))
       : [];
 
   return (
@@ -245,7 +255,7 @@ export default function WalletInvestigator() {
                 BETA
               </Badge>
             </div>
-        </div>
+          </div>
           <p className="text-lg text-slate-600 dark:text-slate-400">
             Explore Aave transaction history across all chains and markets
           </p>
@@ -264,7 +274,8 @@ export default function WalletInvestigator() {
                 Wallet Address
               </CardTitle>
               <CardDescription>
-                Enter an Ethereum wallet address to view its Aave transaction history across all supported mainnet chains
+                Enter an Ethereum wallet address to view its Aave transaction history across all supported mainnet chains.
+                You can also share direct links using: ?walletAddress=0x...
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -274,11 +285,10 @@ export default function WalletInvestigator() {
                     placeholder="0x57ab7ee15cE5ECacB1aB84EE42D5A9d0d8112922"
                     value={walletAddress}
                     onChange={(e) => setWalletAddress(e.target.value)}
-                    className={`text-sm font-mono ${
-                      walletAddress && !isValidAddress 
-                        ? 'border-red-300 focus-visible:ring-red-500' 
-                        : ''
-                    }`}
+                    className={`text-sm font-mono ${walletAddress && !isValidAddress
+                      ? 'border-red-300 focus-visible:ring-red-500'
+                      : ''
+                      }`}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   />
                   {walletAddress && !isValidAddress && (
@@ -287,7 +297,7 @@ export default function WalletInvestigator() {
                     </p>
                   )}
                 </div>
-                <Button 
+                <Button
                   onClick={handleSearch}
                   disabled={!walletAddress.trim() || !isValidAddress || loading}
                   className="bg-blue-600 hover:bg-blue-700"
@@ -299,7 +309,7 @@ export default function WalletInvestigator() {
                   )}
                   Fetch
                 </Button>
-                <Button 
+                <Button
                   onClick={handleDemo}
                   variant="outline"
                   className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 dark:bg-green-950 dark:border-green-800 dark:text-green-300 dark:hover:bg-green-900"
@@ -398,8 +408,8 @@ export default function WalletInvestigator() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <img 
-                                src={tx.tokenImageUrl} 
+                              <img
+                                src={tx.tokenImageUrl}
                                 alt={tx.tokenSymbol}
                                 className="w-6 h-6 rounded-full"
                                 onError={(e) => {
@@ -423,8 +433,8 @@ export default function WalletInvestigator() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <img 
-                                src={tx.marketIcon} 
+                              <img
+                                src={tx.marketIcon}
                                 alt={tx.marketName}
                                 className="w-5 h-5 rounded-full"
                                 onError={(e) => {
@@ -436,8 +446,8 @@ export default function WalletInvestigator() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <img 
-                                src={tx.chainIcon} 
+                              <img
+                                src={tx.chainIcon}
                                 alt={tx.chainName}
                                 className="w-5 h-5 rounded-full"
                                 onError={(e) => {
@@ -458,8 +468,8 @@ export default function WalletInvestigator() {
                             >
                               <a
                                 href={tx.blockExplorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="flex items-center gap-1"
                               >
                                 <ExternalLink className="h-4 w-4" />
@@ -495,18 +505,18 @@ export default function WalletInvestigator() {
                           >
                             <a
                               href={tx.blockExplorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+                              target="_blank"
+                              rel="noopener noreferrer"
                               className="flex items-center gap-1"
                             >
                               <ExternalLink className="h-4 w-4" />
                             </a>
                           </Button>
                         </div>
-                        
+
                         <div className="flex items-center gap-3 mb-3">
-                          <img 
-                            src={tx.tokenImageUrl} 
+                          <img
+                            src={tx.tokenImageUrl}
                             alt={tx.tokenSymbol}
                             className="w-8 h-8 rounded-full"
                             onError={(e) => {
@@ -535,8 +545,8 @@ export default function WalletInvestigator() {
 
                         <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
                           <div className="flex items-center gap-2">
-                            <img 
-                              src={tx.chainIcon} 
+                            <img
+                              src={tx.chainIcon}
                               alt={tx.chainName}
                               className="w-4 h-4 rounded-full"
                               onError={(e) => {
