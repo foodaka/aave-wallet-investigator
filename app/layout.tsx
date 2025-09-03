@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AaveProviderWrapper } from "@/components/aave-provider";
+import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   description: "Explore Aave transaction history across all chains and markets. Comprehensive DeFi analytics for any wallet address on 14+ blockchain networks.",
   keywords: [
     "Aave",
-    "DeFi", 
+    "DeFi",
     "wallet",
     "transaction history",
     "blockchain analytics",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   creator: "Aave Community",
   publisher: "justuseaave.xyz",
   metadataBase: new URL("https://wallet.justuseaave.xyz"),
-  
+
   // Open Graph
   openGraph: {
     type: "website",
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
       }
     ],
   },
-  
+
   // Twitter Card
   twitter: {
     card: "summary_large_image",
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
     description: "Explore Aave transaction history across all chains and markets. Comprehensive DeFi analytics for any wallet address on 14+ blockchain networks.",
     images: ["/og-image.svg"],
   },
-  
+
   // Additional meta tags
   robots: {
     index: true,
@@ -74,12 +75,12 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  
+
   // App specific
   applicationName: "Aave Wallet Investigator",
   category: "finance",
   classification: "DeFi Analytics Tool",
-  
+
   // Icons
   icons: {
     icon: [
@@ -88,10 +89,10 @@ export const metadata: Metadata = {
     shortcut: "/icon.svg",
     apple: "/icon.svg",
   },
-  
+
   // PWA Manifest
   manifest: "/manifest.json",
-  
+
   // Viewport
   viewport: {
     width: "device-width",
@@ -100,7 +101,7 @@ export const metadata: Metadata = {
     userScalable: false,
     viewportFit: "cover",
   },
-  
+
   // Verification (add these if you have them)
   // verification: {
   //   google: "your-google-verification-code",
@@ -121,6 +122,7 @@ export default function RootLayout({
         <AaveProviderWrapper>
           {children}
         </AaveProviderWrapper>
+        <Analytics />
       </body>
     </html>
   );
